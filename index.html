@@ -24,6 +24,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            table-layout: fixed;
         }
         th, td {
             border: 1px solid #ddd;
@@ -32,7 +33,7 @@
         th {
             background-color: #f2f2f2;
             text-align: center;
-            padding: 6px 4px; /* Başlık hücrelerinde biraz daha padding */
+            padding: 6px 4px;
         }
         tr:nth-child(even) {
             background-color: #f9f9f9;
@@ -60,18 +61,17 @@
             border: 1px solid #ccc;
             border-radius: 3px;
         }
-        /* Sütun genişlikleri */
-        td:first-child { /* Altın Cinsi sütunu */
+        td:first-child {
             width: 60px;
             padding-left: 6px;
         }
-        td:nth-child(2) { /* Miktar sütunu */
+        td:nth-child(2) {
             width: 60px;
         }
-        td:nth-child(3) { /* Fiyat sütunu (daha geniş) */
+        td:nth-child(3) {
             width: 120px;
         }
-        .total { /* Toplam sütunu (en geniş) */
+        .total {
             width: 180px;
             text-align: right;
             padding-right: 8px !important;
@@ -152,8 +152,17 @@
     <button onclick="addNewRow()">Satır Ekle</button>
     
     <script>
+        // Sayıyı formatlı şekilde gösterir (1.000,00)
         function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            return new Intl.NumberFormat('tr-TR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(num);
+        }
+
+        // Formatlı string'i sayıya çevirir
+        function parseFormattedNumber(str) {
+            return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
         }
 
         function calculateRow(input) {
@@ -163,7 +172,7 @@
             const totalCell = row.querySelector('.total');
             
             const total = quantity * price;
-            totalCell.textContent = formatNumber(total.toFixed(2));
+            totalCell.textContent = formatNumber(total);
             
             calculateGrandTotal();
         }
@@ -174,12 +183,12 @@
             
             totals.forEach(totalCell => {
                 if (totalCell.id !== 'grandTotal') {
-                    const value = parseFloat(totalCell.textContent.replace(/\./g, '')) || 0;
+                    const value = parseFormattedNumber(totalCell.textContent);
                     grandTotal += value;
                 }
             });
             
-            document.getElementById('grandTotal').textContent = formatNumber(grandTotal.toFixed(2));
+            document.getElementById('grandTotal').textContent = formatNumber(grandTotal);
         }
         
         function addNewRow() {
