@@ -13,6 +13,16 @@
             text-align: center;
             color: #d4af37;
         }
+        .header-input {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            width: 200px;
+            border: none;
+            border-bottom: 2px solid #d4af37;
+            color: #d4af37;
+            margin-bottom: 20px;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -47,22 +57,24 @@
             background-color: #45a049;
         }
         input {
-            width: 100%;
             box-sizing: border-box;
             padding: 5px;
         }
-        .delete-btn {
-            background-color: #f44336;
-            padding: 3px 6px;
-            font-size: 12px;
+        .quantity, .price {
+            width: 100%;
         }
-        .delete-btn:hover {
-            background-color: #d32f2f;
+        .gold-type {
+            width: 120px;
+        }
+        .total {
+            min-width: 100px;
+            text-align: right;
+            padding-right: 15px;
         }
     </style>
 </head>
 <body>
-    <h1>Kuyumcu</h1>
+    <input type="text" class="header-input" value="Kuyumcu" placeholder="İşletme Adı">
     
     <table id="goldTable">
         <thead>
@@ -71,7 +83,6 @@
                 <th>Miktar</th>
                 <th>Fiyat</th>
                 <th>Toplam</th>
-                <th>İşlem</th>
             </tr>
         </thead>
         <tbody>
@@ -80,56 +91,48 @@
                 <td><input type="number" value="80" class="quantity" onchange="calculateRow(this)"></td>
                 <td><input type="number" class="price" onchange="calculateRow(this)"></td>
                 <td class="total">0</td>
-                <td></td>
             </tr>
             <tr>
                 <td>5'li Altın</td>
                 <td><input type="number" value="1" class="quantity" onchange="calculateRow(this)"></td>
                 <td><input type="number" class="price" onchange="calculateRow(this)"></td>
                 <td class="total">0</td>
-                <td></td>
             </tr>
             <tr>
                 <td>Tam Altın</td>
                 <td><input type="number" value="1" class="quantity" onchange="calculateRow(this)"></td>
                 <td><input type="number" class="price" onchange="calculateRow(this)"></td>
                 <td class="total">0</td>
-                <td></td>
             </tr>
             <tr>
                 <td>Yarım Altın</td>
                 <td><input type="number" value="3" class="quantity" onchange="calculateRow(this)"></td>
                 <td><input type="number" class="price" onchange="calculateRow(this)"></td>
                 <td class="total">0</td>
-                <td></td>
             </tr>
             <tr>
                 <td>Çeyrek Altın</td>
                 <td><input type="number" value="19" class="quantity" onchange="calculateRow(this)"></td>
                 <td><input type="number" class="price" onchange="calculateRow(this)"></td>
                 <td class="total">0</td>
-                <td></td>
             </tr>
             <tr>
                 <td>Gram 24K</td>
                 <td><input type="number" value="2" class="quantity" onchange="calculateRow(this)"></td>
                 <td><input type="number" class="price" onchange="calculateRow(this)"></td>
                 <td class="total">0</td>
-                <td></td>
             </tr>
             <tr>
                 <td>Gram 22K</td>
                 <td><input type="number" value="9.5" class="quantity" onchange="calculateRow(this)"></td>
                 <td><input type="number" class="price" onchange="calculateRow(this)"></td>
                 <td class="total">0</td>
-                <td></td>
             </tr>
         </tbody>
         <tfoot>
             <tr class="total-row">
                 <td colspan="3">Genel Toplam</td>
-                <td id="grandTotal">0</td>
-                <td></td>
+                <td class="total" id="grandTotal">0</td>
             </tr>
         </tfoot>
     </table>
@@ -137,6 +140,10 @@
     <button onclick="addNewRow()">Satır Ekle</button>
     
     <script>
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
         function calculateRow(input) {
             const row = input.parentNode.parentNode;
             const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
@@ -144,7 +151,7 @@
             const totalCell = row.querySelector('.total');
             
             const total = quantity * price;
-            totalCell.textContent = total.toFixed(2);
+            totalCell.textContent = formatNumber(total.toFixed(2));
             
             calculateGrandTotal();
         }
@@ -155,11 +162,12 @@
             
             totals.forEach(totalCell => {
                 if (totalCell.id !== 'grandTotal') {
-                    grandTotal += parseFloat(totalCell.textContent) || 0;
+                    const value = parseFloat(totalCell.textContent.replace(/\./g, '')) || 0;
+                    grandTotal += value;
                 }
             });
             
-            document.getElementById('grandTotal').textContent = grandTotal.toFixed(2);
+            document.getElementById('grandTotal').textContent = formatNumber(grandTotal.toFixed(2));
         }
         
         function addNewRow() {
@@ -167,20 +175,13 @@
             const newRow = document.createElement('tr');
             
             newRow.innerHTML = `
-                <td><input type="text" class="gold-type"></td>
+                <td><input type="text" class="gold-type" placeholder="Altın Türü"></td>
                 <td><input type="number" value="1" class="quantity" onchange="calculateRow(this)"></td>
                 <td><input type="number" class="price" onchange="calculateRow(this)"></td>
                 <td class="total">0</td>
-                <td><button class="delete-btn" onclick="deleteRow(this)">Sil</button></td>
             `;
             
             tbody.appendChild(newRow);
-        }
-        
-        function deleteRow(button) {
-            const row = button.parentNode.parentNode;
-            row.parentNode.removeChild(row);
-            calculateGrandTotal();
         }
         
         // Sayfa yüklendiğinde tüm satırları hesapla
