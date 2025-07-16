@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuyumcu Stok Takip</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #d4af37;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            text-align: center;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .total-row {
+            font-weight: bold;
+            background-color: #e6f7ff !important;
+        }
+        button {
+            margin-top: 10px;
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 5px;
+        }
+        .delete-btn {
+            background-color: #f44336;
+            padding: 3px 6px;
+            font-size: 12px;
+        }
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <h1>Kuyumcu</h1>
+    
+    <table id="goldTable">
+        <thead>
+            <tr>
+                <th>Altın Cinsi</th>
+                <th>Miktar</th>
+                <th>Fiyat</th>
+                <th>Toplam</th>
+                <th>İşlem</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Ata Lira</td>
+                <td><input type="number" value="80" class="quantity" onchange="calculateRow(this)"></td>
+                <td><input type="number" class="price" onchange="calculateRow(this)"></td>
+                <td class="total">0</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>5'li Altın</td>
+                <td><input type="number" value="1" class="quantity" onchange="calculateRow(this)"></td>
+                <td><input type="number" class="price" onchange="calculateRow(this)"></td>
+                <td class="total">0</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Tam Altın</td>
+                <td><input type="number" value="1" class="quantity" onchange="calculateRow(this)"></td>
+                <td><input type="number" class="price" onchange="calculateRow(this)"></td>
+                <td class="total">0</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Yarım Altın</td>
+                <td><input type="number" value="3" class="quantity" onchange="calculateRow(this)"></td>
+                <td><input type="number" class="price" onchange="calculateRow(this)"></td>
+                <td class="total">0</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Çeyrek Altın</td>
+                <td><input type="number" value="19" class="quantity" onchange="calculateRow(this)"></td>
+                <td><input type="number" class="price" onchange="calculateRow(this)"></td>
+                <td class="total">0</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Gram 24K</td>
+                <td><input type="number" value="2" class="quantity" onchange="calculateRow(this)"></td>
+                <td><input type="number" class="price" onchange="calculateRow(this)"></td>
+                <td class="total">0</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Gram 22K</td>
+                <td><input type="number" value="9.5" class="quantity" onchange="calculateRow(this)"></td>
+                <td><input type="number" class="price" onchange="calculateRow(this)"></td>
+                <td class="total">0</td>
+                <td></td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="3">Genel Toplam</td>
+                <td id="grandTotal">0</td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+    
+    <button onclick="addNewRow()">Satır Ekle</button>
+    
+    <script>
+        function calculateRow(input) {
+            const row = input.parentNode.parentNode;
+            const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
+            const price = parseFloat(row.querySelector('.price').value) || 0;
+            const totalCell = row.querySelector('.total');
+            
+            const total = quantity * price;
+            totalCell.textContent = total.toFixed(2);
+            
+            calculateGrandTotal();
+        }
+        
+        function calculateGrandTotal() {
+            const totals = document.querySelectorAll('.total');
+            let grandTotal = 0;
+            
+            totals.forEach(totalCell => {
+                if (totalCell.id !== 'grandTotal') {
+                    grandTotal += parseFloat(totalCell.textContent) || 0;
+                }
+            });
+            
+            document.getElementById('grandTotal').textContent = grandTotal.toFixed(2);
+        }
+        
+        function addNewRow() {
+            const tbody = document.querySelector('#goldTable tbody');
+            const newRow = document.createElement('tr');
+            
+            newRow.innerHTML = `
+                <td><input type="text" class="gold-type"></td>
+                <td><input type="number" value="1" class="quantity" onchange="calculateRow(this)"></td>
+                <td><input type="number" class="price" onchange="calculateRow(this)"></td>
+                <td class="total">0</td>
+                <td><button class="delete-btn" onclick="deleteRow(this)">Sil</button></td>
+            `;
+            
+            tbody.appendChild(newRow);
+        }
+        
+        function deleteRow(button) {
+            const row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+            calculateGrandTotal();
+        }
+        
+        // Sayfa yüklendiğinde tüm satırları hesapla
+        window.onload = function() {
+            const quantityInputs = document.querySelectorAll('.quantity');
+            quantityInputs.forEach(input => {
+                calculateRow(input);
+            });
+        };
+    </script>
+</body>
+</html>
